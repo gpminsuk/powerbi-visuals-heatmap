@@ -1,31 +1,57 @@
 {
   "dataRoles": [
     {
-      "name": "Category",
+      "name": "CategoryX",
       "kind": "Grouping",
-      "displayName": "Category",
-      "displayNameKey": "Visual_Category"
+      "displayName": "CategoryX",
+      "displayNameKey": "Visual_CategoryX"
     },
     {
-      "name": "Y",
+      "name": "CategoryY",
+      "kind": "Grouping",
+      "displayName": "CategoryY",
+      "displayNameKey": "Visual_CategoryY"
+    },
+    {
+      "name": "Group",
+      "kind": "Grouping",
+      "displayName": "Group",
+      "displayNameKey": "Visual_Group"
+    },
+    {
+      "name": "Value",
       "kind": "Measure",
-      "displayName": "Y",
-      "displayNameKey": "Visual_Y"
+      "displayName": "Value",
+      "displayNameKey": "Visual_Value"
     }
   ],
   "dataViewMappings": [
     {
       "categorical": {
         "categories": {
-          "for": {
-            "in": "Category"
-          }
+          "select": [
+            {
+              "bind": {
+                "to" : "CategoryX"
+              }
+            },
+            {
+              "bind": {
+                "to" : "CategoryY"
+              }
+            },
+            {
+              "bind": {
+                "to" : "Group"
+              }
+            }
+          ]
         },
         "values": {
           "select": [
             {
               "bind": {
-                "to": "Y"
+                "to": "Value"
               }
             }
           ]
@@ -33,13 +59,19 @@
       },
       "conditions": [
         {
-          "Category": {
+          "CategoryX": {
+            "max": 1
+          },
+          "CategoryY": {
             "max": 1
           }
         }
       ]
     }
   ],
+  "sorting": {
+    "default": {   }
+  },
   "objects": {
     "general": {
       "displayName": "General",

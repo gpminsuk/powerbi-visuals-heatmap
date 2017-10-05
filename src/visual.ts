@@ -112,13 +112,24 @@ module powerbi.extensibility.visual {
 
         public converter(dataView: DataView, colors: IColorPalette): TableHeatMapChartData {
             // no category - nothing to display
-            if (!dataView || !dataView.categorical || !dataView.categorical.categories || !dataView.categorical.categories[0] || !dataView.categorical.categories[0].values || !dataView.categorical.categories[0].values.length) {
+            if (!dataView ||
+                !dataView.categorical ||
+                !dataView.categorical.categories ||
+                !dataView.categorical.categories[0] ||
+                !dataView.categorical.categories[0].values ||
+                !dataView.categorical.categories[0].values.length ||
+                !dataView.categorical.categories[1] ||
+                !dataView.categorical.categories[1].values ||
+                !dataView.categorical.categories[1].values.length) {
                 return <TableHeatMapChartData>{
                     dataPoints: null
                 };
             }
             // no values - nothing to display
-            if (!dataView.categorical.values || !dataView.categorical.values[0] || !dataView.categorical.values[0].values || !dataView.categorical.values[0].values.length) {
+            if (!dataView.categorical.values ||
+                !dataView.categorical.values[0] ||
+                !dataView.categorical.values[0].values ||
+                !dataView.categorical.values[0].values.length) {
                 return <TableHeatMapChartData>{
                     dataPoints: null
                 };
@@ -131,8 +142,9 @@ module powerbi.extensibility.visual {
             let catTable: DataViewTable = dataView.table;
             let catX: string[] = [];
             let catY: string[] = [];
+            let groups: string[] = ['default'];
 
-            let categoryX: string, categoryY: string;
+            let categoryX: string, categoryY: string, group: string = 'default';
 
             categoryValueFormatter = ValueFormatter.create({
                 format: ValueFormatter.getFormatStringByColumn(dataView.categorical.categories[0].source),
@@ -156,29 +168,26 @@ module powerbi.extensibility.visual {
                         });
                     }
 
-                    if (!catMetaData.columns[j].isMeasure) {
+                    if (catMetaData.columns[j].roles["CategoryX"]) {
                         categoryX = catX[i] = <string>catTable.rows[i][j];
                     }
-                    if (catMetaData.columns[j].isMeasure) {
+                    if (catMetaData.columns[j].roles["CategoryY"]) {
+                        categoryY = catY[i] = <string>catTable.rows[i][j];
+                    }
+                    if (catMetaData.columns[j].roles["Group"]) {
+                        group = groups[i] = <string>catTable.rows[i][j];
+                    }
+                    if (catMetaData.columns[j].roles["Value"]) {
                         let value: any = catTable.rows[i][j];
                         let valueStr: string;
                         if (value) {
-                            categoryY = catY[j] = catMetaData.columns[j].displayName;
-                            if (catMetaData.columns[j].groupName) {
-                                categoryY += ": " + catMetaData.columns[j].groupName;
-                                catY[j] += ": " + catMetaData.columns[j].groupName;
-                            }
-
-                            if (value !== parseInt(<string>value, 10))
-                                value = (<number>value).toFixed(2);
                             if (catMetaData.columns[j].format) {
                                 valueStr = columnValFormatter.format(value);
                             }
                         }
                         values[k] = <TableHeatMapDataPoint>{
                             value: value,
-                            valueStr: valueStr,
-                            categoryY: categoryY
+                            valueStr: valueStr
                         };
                         k++;
                     }
@@ -187,19 +196,26 @@ module powerbi.extensibility.visual {
                 values.forEach((element) => {
                     dataPoints.push({
                         categoryX: categoryX,
-                        categoryY: element.categoryY,
+                        categoryY: categoryY,
+                        group: group,
                         value: element.value,
                         valueStr: element.valueStr
                     });
                 });
             }
+            console.log(groups, groups.filter((n, i , a) => {
+                return n !== undefined && a.indexOf(n) == i;
+            }))
             return <TableHeatMapChartData>{
                 dataPoints: dataPoints,
-                categoryX: catX.filter((n) => {
-                    return n !== undefined;
+                categoryX: catX.filter((n, i, a) => {
+                    return n !== undefined && a.indexOf(n) == i;
                 }),
-                categoryY: catY.filter((n) => {
-                    return n !== undefined;
+                categoryY: catY.filter((n, i , a) => {
+                    return n !== undefined && a.indexOf(n) == i;
+                }),
+                groups: groups.filter((n, i , a) => {
+                    return n !== undefined && a.indexOf(n) == i;
                 }),
                 categoryValueFormatter: categoryValueFormatter,
                 valueFormatter: valueFormatter
@@ -269,7 +285,7 @@ module powerbi.extensibility.visual {
                     .domain([minDataValue, maxDataValue])
                     .range(colors);
 
-                let gridSizeWidth: number = Math.floor(this.viewport.width / (chartData.categoryX.length + 1));
+                let gridSizeWidth: number = Math.floor(this.viewport.width / (chartData.categoryX.length + 1 + chartData.groups.length * 2));
                 gridSizeWidth = gridSizeWidth > TableHeatMap.ConstGridSizeWidthLimit ? TableHeatMap.ConstGridSizeWidthLimit : gridSizeWidth;
                 let gridSizeHeight: number = gridSizeWidth * TableHeatMap.ConstGridHeightWidthRaito;
 
@@ -278,6 +294,7 @@ module powerbi.extensibility.visual {
 
                 let xOffset: number = gridSizeWidth + this.margin.left;
                 let yOffset: number = this.margin.top;
+                let gap: number = gridSizeWidth * 2;
 
                 this.mainGraphics.selectAll("." + TableHeatMap.ClsCategoryYLabel)
                     .data(chartData.categoryY)
@@ -297,24 +314,60 @@ module powerbi.extensibility.visual {
                 this.mainGraphics.selectAll("." + TableHeatMap.ClsCategoryYLabel)
                     .call(this.wrap, gridSizeWidth);
 
-                this.mainGraphics.selectAll("." + TableHeatMap.ClsCategoryXLabel)
-                    .data(chartData.categoryX)
-                    .enter().append(TableHeatMap.HtmlObjText)
-                    .text(function (d: string) {
-                        return chartData.categoryValueFormatter.format(d);
+                for (let i in chartData.groups) {
+                    let categoryX = chartData.dataPoints.filter((v) => v.group === chartData.groups[i]).map((v) => v.categoryX).filter((n, i, a) => {
+                        return n !== undefined && a.indexOf(n) == i;
                     })
-                    .attr(TableHeatMap.AttrX, function (d: string, i: number) {
-                        return i * gridSizeWidth + xOffset;
-                    })
-                    .attr(TableHeatMap.AttrY, this.margin.top)
-                    .attr(TableHeatMap.AttrDY, TableHeatMap.Const0em)
-                    .style(TableHeatMap.StTextAnchor, TableHeatMap.ConstMiddle)
-                    .classed(TableHeatMap.ClsCategoryXLabel + " " + TableHeatMap.ClsMono + " " + TableHeatMap.ClsAxis, true)
-                    .attr(TableHeatMap.AttrTransform, translate(gridSizeHeight, TableHeatMap.ConstShiftLabelFromGrid));
-
+                    let group = chartData.groups[i]
+                    this.mainGraphics.selectAll("." + TableHeatMap.ClsCategoryXLabel + group)
+                        .data(categoryX)
+                        .enter().append(TableHeatMap.HtmlObjText)
+                        .text(function (d: string) {
+                            return chartData.categoryValueFormatter.format(d);
+                        })
+                        .attr(TableHeatMap.AttrX, function (d: string, i: number) {
+                            return chartData.categoryX.indexOf(d) * gridSizeWidth + xOffset + chartData.groups.indexOf(group) * gap;
+                        })
+                        .attr(TableHeatMap.AttrY, this.margin.top)
+                        .attr(TableHeatMap.AttrDY, TableHeatMap.Const0em)
+                        .style(TableHeatMap.StTextAnchor, TableHeatMap.ConstMiddle)
+                        .classed(TableHeatMap.ClsCategoryXLabel + " " + TableHeatMap.ClsMono + " " + TableHeatMap.ClsAxis, true)
+                        .attr(TableHeatMap.AttrTransform, translate(gridSizeHeight, TableHeatMap.ConstShiftLabelFromGrid));
+                }
                 this.truncateTextIfNeeded(this.mainGraphics.selectAll("." + TableHeatMap.ClsCategoryXLabel), gridSizeWidth);
                 this.truncateTextIfNeeded(this.mainGraphics.selectAll("." + TableHeatMap.ClsCategoryYLabel), gridSizeWidth);
-
+                
+                for (let i in chartData.groups) {
+                    let data = chartData.dataPoints.filter((v) => v.group === chartData.groups[i]);
+                    let heatMap: d3.Selection<TableHeatMapDataPoint> = this.mainGraphics.selectAll("." + TableHeatMap.ClsCategoryX + chartData.groups[i])
+                        .data(data)
+                        .enter()
+                        .append(TableHeatMap.HtmlObjRect)
+                        .attr(TableHeatMap.AttrX, function (d: TableHeatMapDataPoint) {
+                            return chartData.categoryX.indexOf(d.categoryX) * gridSizeWidth + xOffset + chartData.groups.indexOf(d.group) * gap;
+                        })
+                        .attr(TableHeatMap.AttrY, function (d: TableHeatMapDataPoint) {
+                            return chartData.categoryY.indexOf(d.categoryY) * gridSizeHeight + yOffset;
+                        })
+                        .classed(TableHeatMap.ClsCategoryX + " " + TableHeatMap.ClsBordered, true)
+                        .attr(TableHeatMap.AttrWidth, gridSizeWidth)
+                        .attr(TableHeatMap.AttrHeight, gridSizeHeight)
+                        .style(TableHeatMap.StFill, colors[0]);
+                        
+                    let elementAnimation: d3.Selection<D3Element> = <d3.Selection<D3Element>> this.getAnimationMode(heatMap, suppressAnimations);
+                    elementAnimation.style(TableHeatMap.StFill, function (d: any) {
+                        return <string>colorScale(d.value);
+                    });
+    
+                    heatMap.append(TableHeatMap.HtmlObjTitle).text((d: TableHeatMapDataPoint) => {
+                        if (d.valueStr !== undefined) {
+                            return d.categoryX + ": " + d.valueStr;
+                        }
+                        else {
+                            return d.categoryX + ": " + d.value;
+                        }
+                    });
+                }/*
                 let heatMap: d3.Selection<TableHeatMapDataPoint> = this.mainGraphics.selectAll("." + TableHeatMap.ClsCategoryX)
                     .data(chartData.dataPoints)
                     .enter()
@@ -329,7 +382,7 @@ module powerbi.extensibility.visual {
                     .attr(TableHeatMap.AttrWidth, gridSizeWidth)
                     .attr(TableHeatMap.AttrHeight, gridSizeHeight)
                     .style(TableHeatMap.StFill, colors[0]);
-
+*/
                 // add data labels
                 let textProperties: TextProperties = {
                     fontSize: this.settings.labels.fontSize + "px",
@@ -364,20 +417,6 @@ module powerbi.extensibility.visual {
                     });
 
                 heatMapDataLablesData.exit().remove();
-
-                let elementAnimation: d3.Selection<D3Element> = <d3.Selection<D3Element>> this.getAnimationMode(heatMap, suppressAnimations);
-                elementAnimation.style(TableHeatMap.StFill, function (d: any) {
-                    return <string>colorScale(d.value);
-                });
-
-                heatMap.append(TableHeatMap.HtmlObjTitle).text((d: TableHeatMapDataPoint) => {
-                    if (d.valueStr !== undefined) {
-                        return d.categoryX + ": " + d.valueStr;
-                    }
-                    else {
-                        return d.categoryX + ": " + d.value;
-                    }
-                });
 
                 // legend
                 let legend: Update<any> = this.mainGraphics.selectAll("." + TableHeatMap.ClsLegend)
