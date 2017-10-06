@@ -3,16 +3,19 @@ module powerbi.extensibility.visual {
     export interface TableHeatMapDataPoint {
         categoryX: string;
         categoryY: string;
-        group: string;
         value: number;
         valueStr: string;
     }
 
-    export interface TableHeatMapChartData {
-        dataPoints: TableHeatMapDataPoint[];
+    export interface TableHeatMapChartGroup {
+        name: string;
         categoryX: string[];
+        dataPoints: TableHeatMapDataPoint[];
+    }
+
+    export interface TableHeatMapChartData {
         categoryY: string[];
-        groups: string[];
+        groups: TableHeatMapChartGroup[];
         categoryValueFormatter: IValueFormatter;
         valueFormatter: IValueFormatter;
     }

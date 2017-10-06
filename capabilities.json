@@ -32,17 +32,17 @@
           "select": [
             {
               "bind": {
-                "to" : "CategoryX"
+                "to": "CategoryX"
               }
             },
             {
               "bind": {
-                "to" : "CategoryY"
+                "to": "CategoryY"
               }
             },
             {
               "bind": {
-                "to" : "Group"
+                "to": "Group"
               }
             }
           ]
@@ -70,7 +70,22 @@
     }
   ],
   "sorting": {
-    "default": {   }
+    "implicit": {
+      "clauses": [
+        {
+          "role": "Group",
+          "direction": 2
+        },
+        {
+          "role": "CategoryX",
+          "direction": 2
+        },
+        {
+          "role": "CategoryY",
+          "direction": 2
+        }
+      ]
+    }
   },
   "objects": {
     "general": {
@@ -80,41 +95,146 @@
         "colorbrewer": {
           "type": {
             "enumeration": [
-              { "value": "YlGn", "displayName": "YlGn" },
-              { "value": "YlGnBu", "displayName": "YlGnBu" },
-              { "value": "GnBu", "displayName": "GnBu" },
-              { "value": "BuGn", "displayName": "BuGn" },
-              { "value": "PuBuGn", "displayName": "PuBuGn" },
-              { "value": "PuBu", "displayName": "PuBu" },
-              { "value": "BuPu", "displayName": "BuPu" },
-              { "value": "RdPu", "displayName": "RdPu" },
-              { "value": "PuRd", "displayName": "PuRd" },
-              { "value": "OrRd", "displayName": "OrRd" },
-              { "value": "YlOrRd", "displayName": "YlOrRd" },
-              { "value": "YlOrBr", "displayName": "YlOrBr" },
-              { "value": "Purples", "displayName": "Purples" },
-              { "value": "Blues", "displayName": "Blues" },
-              { "value": "Greens", "displayName": "Greens" },
-              { "value": "Oranges", "displayName": "Oranges" },
-              { "value": "Reds", "displayName": "Reds" },
-              { "value": "Greys", "displayName": "Greys" },
-              { "value": "PuOr", "displayName": "PuOr" },
-              { "value": "BrBG", "displayName": "BrBG" },
-              { "value": "PRGn", "displayName": "PRGn" },
-              { "value": "PiYG", "displayName": "PiYG" },
-              { "value": "RdBu", "displayName": "RdBu" },
-              { "value": "RdGy", "displayName": "RdGy" },
-              { "value": "RdYlBu", "displayName": "RdYlBu" },
-              { "value": "Spectral", "displayName": "Spectral" },
-              { "value": "RdYlGn", "displayName": "RdYlGn" },
-              { "value": "Accent", "displayName": "Accent" },
-              { "value": "Dark2", "displayName": "Dark2" },
-              { "value": "Paired", "displayName": "Paired" },
-              { "value": "Pastel1", "displayName": "Paired1" },
-              { "value": "Pastel2", "displayName": "Paired2" },
-              { "value": "Set1", "displayName": "Set1" },
-              { "value": "Set2", "displayName": "Set2" },
-              { "value": "Set3", "displayName": "Set3" }
+              {
+                "value": "YlGn",
+                "displayName": "YlGn"
+              },
+              {
+                "value": "YlGnBu",
+                "displayName": "YlGnBu"
+              },
+              {
+                "value": "GnBu",
+                "displayName": "GnBu"
+              },
+              {
+                "value": "BuGn",
+                "displayName": "BuGn"
+              },
+              {
+                "value": "PuBuGn",
+                "displayName": "PuBuGn"
+              },
+              {
+                "value": "PuBu",
+                "displayName": "PuBu"
+              },
+              {
+                "value": "BuPu",
+                "displayName": "BuPu"
+              },
+              {
+                "value": "RdPu",
+                "displayName": "RdPu"
+              },
+              {
+                "value": "PuRd",
+                "displayName": "PuRd"
+              },
+              {
+                "value": "OrRd",
+                "displayName": "OrRd"
+              },
+              {
+                "value": "YlOrRd",
+                "displayName": "YlOrRd"
+              },
+              {
+                "value": "YlOrBr",
+                "displayName": "YlOrBr"
+              },
+              {
+                "value": "Purples",
+                "displayName": "Purples"
+              },
+              {
+                "value": "Blues",
+                "displayName": "Blues"
+              },
+              {
+                "value": "Greens",
+                "displayName": "Greens"
+              },
+              {
+                "value": "Oranges",
+                "displayName": "Oranges"
+              },
+              {
+                "value": "Reds",
+                "displayName": "Reds"
+              },
+              {
+                "value": "Greys",
+                "displayName": "Greys"
+              },
+              {
+                "value": "PuOr",
+                "displayName": "PuOr"
+              },
+              {
+                "value": "BrBG",
+                "displayName": "BrBG"
+              },
+              {
+                "value": "PRGn",
+                "displayName": "PRGn"
+              },
+              {
+                "value": "PiYG",
+                "displayName": "PiYG"
+              },
+              {
+                "value": "RdBu",
+                "displayName": "RdBu"
+              },
+              {
+                "value": "RdGy",
+                "displayName": "RdGy"
+              },
+              {
+                "value": "RdYlBu",
+                "displayName": "RdYlBu"
+              },
+              {
+                "value": "Spectral",
+                "displayName": "Spectral"
+              },
+              {
+                "value": "RdYlGn",
+                "displayName": "RdYlGn"
+              },
+              {
+                "value": "Accent",
+                "displayName": "Accent"
+              },
+              {
+                "value": "Dark2",
+                "displayName": "Dark2"
+              },
+              {
+                "value": "Paired",
+                "displayName": "Paired"
+              },
+              {
+                "value": "Pastel1",
+                "displayName": "Paired1"
+              },
+              {
+                "value": "Pastel2",
+                "displayName": "Paired2"
+              },
+              {
+                "value": "Set1",
+                "displayName": "Set1"
+              },
+              {
+                "value": "Set2",
+                "displayName": "Set2"
+              },
+              {
+                "value": "Set3",
+                "displayName": "Set3"
+              }
             ]
           },
           "displayName": "Colorbrewer",
@@ -133,41 +253,41 @@
       "displayName": "Data labels",
       "displayNameKey": "Visual_DataPointsLabels",
       "properties": {
-          "show": {
-              "displayName": "Show",
-              "displayNameKey": "Visual_Show",
-              "type": {
-                  "bool": true
-              }
-          },
-          "fill": {
-              "displayName": "Color",
-              "displayNameKey": "Visual_LabelsFill",
-              "type": {
-                  "fill": {
-                      "solid": {
-                          "color": true
-                      }
-                  }
-              }
-          },
-          "fontSize": {
-              "displayName": "Text Size",
-              "displayNameKey": "Visual_TextSize",
-              "type": {
-                  "formatting": {
-                      "fontSize": true
-                  }
-              }
-          },
-          "forceDisplay": {
-              "displayName": "Force display",
-              "displayNameKey": "Visual_Force_Display",
-              "description": "Display all labels anyway",
-              "type": {
-                  "bool": true
-              }
+        "show": {
+          "displayName": "Show",
+          "displayNameKey": "Visual_Show",
+          "type": {
+            "bool": true
           }
+        },
+        "fill": {
+          "displayName": "Color",
+          "displayNameKey": "Visual_LabelsFill",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "fontSize": {
+          "displayName": "Text Size",
+          "displayNameKey": "Visual_TextSize",
+          "type": {
+            "formatting": {
+              "fontSize": true
+            }
+          }
+        },
+        "forceDisplay": {
+          "displayName": "Force display",
+          "displayNameKey": "Visual_Force_Display",
+          "description": "Display all labels anyway",
+          "type": {
+            "bool": true
+          }
+        }
       }
     }
   }

@@ -35,8 +35,10 @@ module powerbi.extensibility.visual.test {
     import ValueType = powerbi.extensibility.utils.type.ValueType;
 
     export class TableHeatMapData extends TestDataViewBuilder {
-        public static CategoryColumn: string = "Category";
-        public static MeasureColumn: string = "Y";
+        public static CategoryXColumn: string = "CategoryX";
+        public static CategoryYColumn: string = "CategoryY";
+        public static GroupColumn: string = "Group";
+        public static MeasureColumn: string = "Value";
 
         public dataCategory: string[];
         public dataMeasure: number[];
@@ -52,28 +54,36 @@ module powerbi.extensibility.visual.test {
                 [
                     {
                         source: {
-                            displayName: TableHeatMapData.CategoryColumn,
+                            displayName: TableHeatMapData.CategoryXColumn,
                             roles: {
-                                Values: true,
-                                Y: true
+                                CategoryX: true
                             },
-                            type: ValueType.fromDescriptor({text: true})
-                        },
-                        values: this.dataCategory
-                    }
-                ],
-                [
-                    {
-                        source: {
-                            displayName: TableHeatMapData.CategoryColumn,
-                            roles: {
-                                Values: true,
-                                Y: true
-                            },
-                            type: ValueType.fromDescriptor({text: true})
+                            type: ValueType.fromDescriptor({ text: true })
                         },
                         values: this.dataCategory
                     },
+                    {
+                        source: {
+                            displayName: TableHeatMapData.CategoryYColumn,
+                            roles: {
+                                CategoryY: true
+                            },
+                            type: ValueType.fromDescriptor({ text: true })
+                        },
+                        values: this.dataCategory
+                    },
+                    {
+                        source: {
+                            displayName: TableHeatMapData.GroupColumn,
+                            roles: {
+                                Group: true
+                            },
+                            type: ValueType.fromDescriptor({ text: true })
+                        },
+                        values: this.dataCategory
+                    },
+                ],
+                [
                     {
                         source: {
                             displayName: TableHeatMapData.MeasureColumn,
@@ -81,7 +91,7 @@ module powerbi.extensibility.visual.test {
                             roles: {
                                 value: true
                             },
-                            type: ValueType.fromDescriptor({numeric: true})
+                            type: ValueType.fromDescriptor({ numeric: true })
                         },
                         values: this.dataMeasure
                     }
