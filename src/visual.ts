@@ -139,7 +139,8 @@ module powerbi.extensibility.visual {
                 };
             }
 
-            let categoryValueFormatter: IValueFormatter;
+            let categoryXValueFormatter: IValueFormatter;
+            let categoryYValueFormatter: IValueFormatter;
             let valueFormatter: IValueFormatter;
             let dataPoints: TableHeatMapDataPoint[] = [];
             let catMetaData: DataViewMetadata = dataView.metadata;
@@ -149,8 +150,13 @@ module powerbi.extensibility.visual {
 
             let categoryX: string, categoryY: string, groupName: string;
 
-            categoryValueFormatter = ValueFormatter.create({
+            categoryXValueFormatter = ValueFormatter.create({
                 format: ValueFormatter.getFormatStringByColumn(dataView.categorical.categories[0].source),
+                value: dataView.categorical.categories[0].values[0]
+            });
+
+            categoryYValueFormatter = ValueFormatter.create({
+                format: ValueFormatter.getFormatStringByColumn(dataView.categorical.categories[1].source),
                 value: dataView.categorical.categories[0].values[0]
             });
 
@@ -224,7 +230,8 @@ module powerbi.extensibility.visual {
                     return n !== undefined && a.indexOf(n) == i;
                 }),
                 groups: groups,
-                categoryValueFormatter: categoryValueFormatter,
+                categoryXValueFormatter: categoryXValueFormatter,
+                categoryYValueFormatter: categoryYValueFormatter,
                 valueFormatter: valueFormatter
             };
         }
@@ -299,7 +306,7 @@ module powerbi.extensibility.visual {
                     .data(chartData.categoryY)
                     .enter().append(TableHeatMap.HtmlObjText)
                     .text((d: string) => {
-                        return d;
+                        return chartData.categoryYValueFormatter.format(d);
                     })
                     .attr(TableHeatMap.AttrX, categoryXOffset)
                     .attr(TableHeatMap.AttrY, function (d, i) {
@@ -332,7 +339,7 @@ module powerbi.extensibility.visual {
                         .data([group.name])
                         .enter().append(TableHeatMap.HtmlObjText)
                         .text(function (d: string) {
-                            return chartData.categoryValueFormatter.format(d);
+                            return chartData.categoryXValueFormatter.format(d);
                         })
                         .attr(TableHeatMap.AttrX, function (d: string, i: number) {
                             return ((group.categoryX.length * gridSizeWidth) / 2) + xPos;
@@ -347,7 +354,7 @@ module powerbi.extensibility.visual {
                         .data(group.categoryX)
                         .enter().append(TableHeatMap.HtmlObjText)
                         .text(function (d: string) {
-                            return chartData.categoryValueFormatter.format(d);
+                            return chartData.categoryXValueFormatter.format(d);
                         })
                         .attr(TableHeatMap.AttrX, function (d: string, i: number) {
                             return (i * gridSizeWidth) + xPos + gridSizeWidth / 2;

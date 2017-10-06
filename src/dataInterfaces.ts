@@ -16,7 +16,8 @@ module powerbi.extensibility.visual {
     export interface TableHeatMapChartData {
         categoryY: string[];
         groups: TableHeatMapChartGroup[];
-        categoryValueFormatter: IValueFormatter;
+        categoryXValueFormatter: IValueFormatter;
+        categoryYValueFormatter: IValueFormatter;
         valueFormatter: IValueFormatter;
     }
 
